@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* Emerald branding for vendor operations */
+    .text-vendor-emerald { color: #059669; }
+    .btn-glass-vendor { background: rgba(16, 185, 129, 0.05); color: #059669 !important; border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; transition: 0.3s; padding: 8px 16px; text-decoration: none; font-size: 0.9rem; font-weight: 600;}
+    .btn-glass-vendor:hover { background: rgba(16, 185, 129, 0.15); transform: translateY(-2px); border-color: #10b981; }
+
+    /* Style for the new modern list cards */
+    .inventory-card { padding: 1.5rem; transition: transform 0.3s ease; }
+    .inventory-card:hover { transform: translateX(5px); border-color: #10b981; }
+    .product-thumbnail { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,0.5); }
+
+    .btn-action { padding: 6px 12px; font-size: 0.8rem; border-radius: 8px; font-weight: 600; text-decoration: none; margin-left: 5px; }
+    .btn-edit { background: rgba(245, 158, 11, 0.1); color: #f59e0b !important; border: 1px solid rgba(245, 158, 11, 0.2); }
+    .btn-edit:hover { background: rgba(245, 158, 11, 0.2); }
+    .btn-delete { background: rgba(239, 68, 68, 0.1); color: #ef4444 !important; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <h1 class="fw-bold">My Store <span class="text-vendor-emerald">Inventory</span></h1>
+    <a href="{% url 'add_product' %}" class="btn-glass-vendor">
+        ➕ Add New Product
+    </a>
+</div>
+
+<div class="d-flex flex-column gap-3 mb-5">
+    {% for product in products %}
+    <div class="card glass-card inventory-card border-0">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-thumbnail shadow-sm">
+            </div>
+
+            <div class="col">
+                <div class="d-flex justify-content-between">
+                    <h5 class="fw-bold mb-1">{{ product.name }}</h5>
+                    <span class="h5 fw-bold text-vendor-emerald">${{ product.price }}</span>
+                </div>
+                <p class="text-muted small mb-0">{{ product.description|truncatewords:20 }}</p>
+                <div class="mt-2 small">
+                    <span class="text-muted">Stock:</span>
+                    <span class="fw-bold {% if product.stock < 10 %}text-danger{% else %}text-success{% endif %}">
+                        {{ product.stock }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-auto d-flex flex-column gap-2 align-items-end">
+                <a href="#" class="btn-action btn-edit">Edit</a>
+                <a href="#" class="btn-action btn-delete">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center py-5 glass-card">
+        <h3 class="text-muted">No products found.</h3>
+        <p class="text-secondary">Click the button above to add your first item!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

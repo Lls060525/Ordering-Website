@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    /* Centering the business portal */
+    .vendor-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        padding: 50px 0;
+    }
+
+    .glass-card {
+        width: 100%;
+        max-width: 500px;
+        padding: 3.5rem;
+        text-align: center;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    }
+
+    .modern-form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch; /* Forces perfect symmetry */
+        gap: 1.2rem;
+    }
+
+    .field-group {
+        text-align: left;
+    }
+
+    .modern-form label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        margin-left: 4px;
+    }
+
+    .modern-form input {
+        width: 100%;
+        padding: 12px 18px;
+        background: rgba(255, 255, 255, 0.5) !important;
+        border: 2px solid transparent !important;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .modern-form input:focus {
+        border-color: #10b981 !important; /* Emerald Focus */
+        background: white !important;
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+    }
+
+    /* Professional Emerald Button */
+    .btn-vendor {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-top: 1rem;
+        box-shadow: 0 10px 20px -10px rgba(16, 185, 129, 0.5);
+        transition: transform 0.2s;
+    }
+
+    .btn-vendor:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px -10px rgba(16, 185, 129, 0.6);
+    }
+
+    /* Clean UI: Hide default Django clutter */
+    .helptext { display: none; }
+    .errorlist {
+        color: #dc2626;
+        font-size: 0.75rem;
+        list-style: none;
+        padding: 0;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="vendor-wrapper">
+    <div class="glass-card">
+        <div class="mb-5">
+            <span class="badge rounded-pill mb-3" style="background: rgba(16, 185, 129, 0.1); color: #059669; padding: 8px 20px; font-weight: 600;">
+                Vendor Partnership
+            </span>
+            <h2 class="fw-bold display-6 mb-2" style="color: #065f46;">MarketHub for Business</h2>
+            <p class="text-muted small">Join our network of elite sellers today.</p>
+        </div>
+
+        <form method="post" class="modern-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        {{ field.errors }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-vendor">
+                Launch My Store
+            </button>
+        </form>
+
+        <div class="mt-5 pt-4 border-top">
+            <p class="text-muted small mb-0">Changed your mind?</p>
+            <a href="{% url 'customer_signup' %}" class="fw-bold text-decoration-none" style="color: #059669;">
+                Sign up as a Customer →
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

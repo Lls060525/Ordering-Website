@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Finalize Your Order</h2>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white"><h5>Shipping Details</h5></div>
+                <div class="card-body">
+                    <p><strong>Recipient:</strong> {{ user.get_full_name }}</p>
+                    <p><strong>Address:</strong> {{ customer.address|default:"No address on file. Please update your profile." }}</p>
+                    <p><strong>Phone:</strong> {{ customer.phone_number }}</p>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">Edit Shipping Info</a>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white"><h5>Order Review</h5></div>
+                <div class="list-group list-group-flush">
+                    {% for item in cart_items %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6>{{ item.product.name }}</h6>
+                            <small>Qty: {{ item.quantity }}</small>
+                        </div>
+                        <span class="text-muted">${{ item.total }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Order Total</h5>
+                    <div class="d-flex justify-content-between h3 mb-4">
+                        <span>Total:</span>
+                        <span>${{ total_price }}</span>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small>ℹ️ This is a simulated checkout. Clicking "Place Order" will finalize the transaction.</small>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-success btn-lg w-100">Confirm & Place Order</button>
+                    </form>
+                    <a href="{% url 'cart_detail' %}" class="btn btn-link w-100 mt-2">Back to Cart</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

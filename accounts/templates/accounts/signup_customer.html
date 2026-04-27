@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .signup-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 90vh;
+        padding: 40px 0;
+    }
+    .glass-card {
+        width: 100%;
+        max-width: 550px; /* Slightly wider for longer forms */
+        padding: 3.5rem;
+        text-align: center;
+    }
+    .modern-form {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.2rem;
+    }
+    .field-group { text-align: left; }
+    .modern-form label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #6b7280;
+        margin-bottom: 0.4rem;
+        margin-left: 5px;
+    }
+    /* Styles all input boxes uniformly */
+    .modern-form input {
+        width: 100%;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.6) !important;
+        border: 2px solid transparent !important;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    .modern-form input:focus {
+        border-color: #6366f1 !important;
+        background: white !important;
+    }
+    /* Hide the clunky Django help text for a cleaner UI */
+    .helptext { display: none; }
+    .errorlist { color: #ef4444; font-size: 0.8rem; list-style: none; padding: 0; text-align: left; }
+
+    .btn-glow {
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 12px;
+        font-weight: 700;
+        margin-top: 1rem;
+        box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.5);
+    }
+</style>
+
+<div class="signup-wrapper">
+    <div class="glass-card">
+        <div class="mb-4">
+            <h2 class="fw-bold display-6" style="color: #6366f1;">Join MarketHub</h2>
+            <p class="text-muted small">Create your account to start shopping today!</p>
+        </div>
+
+        <form method="post" class="modern-form">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="field-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        {{ field.errors }}
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-glow">Create Customer Account</button>
+        </form>
+
+        <div class="mt-4 pt-3 border-top">
+            <p class="text-muted small">Already have an account? <a href="{% url 'login' %}" class="fw-bold text-decoration-none" style="color: #a855f7;">Sign In</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

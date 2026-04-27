@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketHub | Modern Marketplace</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --customer-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --vendor-emerald: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Smooth background gradient */
+            background: radial-gradient(circle at top right, #fdfcfb 0%, #e2d1c3 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: #1f2937;
+        }
+
+        /* Futuristic Frosted Navbar */
+        .navbar {
+            background: rgba(31, 41, 55, 0.85) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+        }
+
+        /* Glassmorphic Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            transition: all 0.3s ease;
+        }
+
+        /* Primary CTA: Get Started (Customer) */
+        .btn-neon-purple {
+            background: var(--customer-gradient);
+            color: white !important;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-neon-purple:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+            filter: brightness(1.1);
+        }
+
+        /* Secondary CTA: Sell on MarketHub (Vendor) */
+        .btn-glass-emerald {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--vendor-emerald) !important;
+            font-weight: 600;
+            padding: 9px 22px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-glass-emerald:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateY(-2px);
+            border-color: var(--vendor-emerald);
+        }
+
+        /* Notification Badge for Cart */
+        .cart-badge {
+            font-size: 0.7rem;
+            background: #ef4444;
+            border: 2px solid #1f2937;
+        }
+
+        /* Global Form Styling */
+        .modern-form input {
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            Market<span style="background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Hub</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item me-3">
+                        <a class="nav-link position-relative" href="{% url 'cart_detail' %}">
+                            🛒 Cart
+                            {% if request.session.cart %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill cart-badge">
+                                    {{ request.session.cart|length }}
+                                </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="{% url 'customer_orders' %}">📦 Order History</a>
+                    </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link" href="{% url 'dashboard_redirect' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-danger fw-bold" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item me-4">
+                        <a class="nav-link fw-semibold" href="{% url 'login' %}">Login</a>
+                    </li>
+
+                    <li class="nav-item me-2">
+                        <a class="btn-neon-purple" href="{% url 'customer_signup' %}">Get Started</a>
+                    </li>
+
+                    <li class="nav-item me-2">
+                        <a class="btn-glass-emerald" href="{% url 'vendor_signup' %}">Sell on MarketHub</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-3">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} glass-card border-0 text-dark alert-dismissible fade show" role=\"alert\">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div class="container mt-5">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
