@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    .profile-header {
+        background: var(--customer-gradient);
+        height: 150px;
+        border-radius: 24px 24px 0 0;
+    }
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        background: white;
+        border: 5px solid #fdfcfb;
+        border-radius: 50%;
+        margin-top: -60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .modern-form label { font-weight: 700; font-size: 0.8rem; color: #6b7280; text-transform: uppercase; margin-bottom: 5px; margin-left: 5px;}
+    .modern-form input, .modern-form textarea { border-radius: 12px; border: 1px solid rgba(0,0,0,0.1); padding: 12px; background: rgba(255,255,255,0.5); margin-bottom: 1rem; width: 100%;}
+    .modern-form input:focus { outline: none; border-color: #6366f1; background: white; }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="glass-card overflow-hidden border-0">
+                <div class="profile-header"></div>
+                <div class="px-5 pb-5">
+                    <div class="d-flex justify-content-between align-items-end mb-4">
+                        <div class="profile-avatar fw-bold text-primary">
+                            {{ user.username|first|upper }}
+                        </div>
+                        <div class="text-end">
+                            <h2 class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h2>
+                            <span class="badge {% if user.is_customer %}bg-primary{% else %}bg-success{% endif %} rounded-pill">
+                                {% if user.is_customer %}Customer Account{% else %}Vendor Account{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <hr class="mb-5">
+
+                    <form method="POST" class="modern-form">
+                        {% csrf_token %}
+                        <h5 class="fw-bold mb-4">Account Information</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>First Name</label>
+                                {{ u_form.first_name }}
+                            </div>
+                            <div class="col-md-6">
+                                <label>Last Name</label>
+                                {{ u_form.last_name }}
+                            </div>
+                        </div>
+                        <label>Email Address</label>
+                        {{ u_form.email }}
+
+                        <h5 class="fw-bold mt-4 mb-4">
+                            {% if user.is_customer %}Shipping & Contact{% else %}Store Details{% endif %}
+                        </h5>
+                        {{ p_form.as_p }}
+
+                        <div class="d-grid mt-5">
+                            <button type="submit" class="btn-neon-purple border-0">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

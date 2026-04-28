@@ -45,3 +45,18 @@ class VendorSignUpForm(UserCreationForm):
             # We use the extra 'store_name' field from this specific form
             Vendor.objects.create(user=user, store_name=self.cleaned_data.get('store_name'))
         return user
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
+class CustomerProfileForm(forms.ModelForm):
+    class Meta:
+        model = Customer
+        fields = ['phone_number', 'address']
+
+class VendorProfileForm(forms.ModelForm):
+    class Meta:
+        model = Vendor
+        fields = ['store_name']

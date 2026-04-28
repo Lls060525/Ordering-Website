@@ -3,11 +3,13 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from orders.models import Order
 from products import models
 from products.models import Product
-from .forms import CustomerSignUpForm, VendorSignUpForm # You will need to create these
+from .forms import CustomerSignUpForm, VendorSignUpForm, UserUpdateForm, \
+    CustomerProfileForm, VendorProfileForm  # You will need to create these
 from django.contrib.auth.forms import AuthenticationForm
 
 # 1. Dashboard Redirect Logic
@@ -77,7 +79,7 @@ def customer_dashboard(request):
     products = Product.objects.filter(stock__gt=0).order_by('-id')
 
     if query:
-        products = products.filter(models.Q(name__icontains=query) | models.Q(description__icontains=query))
+        products = products.filter(Q(name__icontains=query) | Q(description__icontains=query))
 
     if cat_name:
         products = products.filter(category=cat_name) # Filter by string match
@@ -104,4 +106,36 @@ def vendor_dashboard(request):
 
     return render(request, 'accounts/vendor_dashboard.html', {
         'products': vendor_products  # Pass the list to the template
+    })
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+
+    # Initialize both forms
+    u_form = UserUpdateForm(instance=user)
+
+    if user.is_customer:
+        p_form = CustomerProfileForm(instance=user.customer_profile)
+    else:
+        p_form = VendorProfileForm(instance=user.vendor_profile)
+
+    if request.method == 'POST':
+        u_form = UserUpdateForm(request.POST, instance=user)
+
+        if user.is_customer:
+            p_form = CustomerProfileForm(request.POST, instance=user.customer_profile)
+        else:
+            p_form = VendorProfileForm(request.POST, instance=user.vendor_profile)
+
+        if u_form.is_valid() and p_form.is_valid():
+            u_form.save()
+            p_form.save()
+            messages.success(request, "Your profile has been updated!")
+            return redirect('user_profile')
+
+    return render(request, 'accounts/profile.html', {
+        'u_form': u_form,
+        'p_form': p_form
     })

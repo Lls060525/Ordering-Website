@@ -15,4 +15,5 @@ urlpatterns = [
     path('dashboard/', views.dashboard_redirect, name='dashboard_redirect'),
     path('dashboard/customer/', views.customer_dashboard, name='customer_dashboard'),
     path('dashboard/vendor/', views.vendor_dashboard, name='vendor_dashboard'),
+    path('profile/', views.profile_view, name='user_profile'),
 ]
