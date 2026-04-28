@@ -5,6 +5,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 
 from orders.models import Order
+from products import models
 from products.models import Product
 from .forms import CustomerSignUpForm, VendorSignUpForm # You will need to create these
 from django.contrib.auth.forms import AuthenticationForm
@@ -70,16 +71,25 @@ def logout_view(request):
 
 @login_required
 def customer_dashboard(request):
-    if not request.user.is_customer:
-        return redirect('vendor_dashboard')
+    query = request.GET.get('q', '')
+    cat_name = request.GET.get('category', '')
 
-    # Fetch data for the unified dashboard
     products = Product.objects.filter(stock__gt=0).order_by('-id')
-    recent_orders = Order.objects.filter(customer=request.user.customer_profile).order_by('-created_at')[:5]
+
+    if query:
+        products = products.filter(models.Q(name__icontains=query) | models.Q(description__icontains=query))
+
+    if cat_name:
+        products = products.filter(category=cat_name) # Filter by string match
+
+    # Fetch unique category strings currently used in the system
+    categories = Product.objects.values_list('category', flat=True).exclude(category__isnull=True).exclude(category='').distinct()
 
     return render(request, 'accounts/customer_dashboard.html', {
         'products': products,
-        'orders': recent_orders,
+        'categories': categories, # This is now a list of strings
+        'selected_category': cat_name,
+        'query': query
     })
 
 @login_required
@@ -89,6 +99,8 @@ def vendor_dashboard(request):
 
     # NEW: Fetch products for the current vendor
     vendor_products = Product.objects.filter(vendor=request.user.vendor_profile)
+    categories = Product.objects.values_list('category', flat=True).exclude(category__isnull=True).exclude(category='').distinct()
+
 
     return render(request, 'accounts/vendor_dashboard.html', {
         'products': vendor_products  # Pass the list to the template

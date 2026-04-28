@@ -4,8 +4,8 @@ from .models import Product
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        # We exclude 'vendor' because we will assign it automatically in the view
-        fields = ['name', 'description', 'price', 'stock', 'image']
+        # Include 'category' in the fields list
+        fields = ['category', 'name', 'description', 'price', 'stock', 'image']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
         }

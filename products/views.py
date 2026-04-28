@@ -37,10 +37,26 @@ def add_product(request):
         'title': 'Add New Product'
     })
 
+
 def product_marketplace(request):
-    """A public or customer-only view showing all products from all vendors."""
-    all_products = Product.objects.filter(stock__gt=0) # Only show items in stock
-    return render(request, 'products/marketplace.html', {'products': all_products})
+    """A public view showing products with optional category filtering."""
+    # 1. Get the category name from the URL (e.g., ?category=Tech)
+    category_name = request.GET.get('category')
+
+    # 2. Filter products based on the category if provided
+    if category_name:
+        all_products = Product.objects.filter(category__name=category_name, stock__gt=0)
+    else:
+        all_products = Product.objects.filter(stock__gt=0)
+
+    # 3. Get all categories to display the filter links in the template
+    categories = Product.objects.values_list('category', flat=True).exclude(category__isnull=True).exclude(category='').distinct()
+
+    return render(request, 'products/marketplace.html', {
+        'products': all_products,
+        'categories': categories,
+        'selected_category': category_name
+    })
 
 @login_required
 def edit_product(request, product_id):

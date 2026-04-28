@@ -49,15 +49,12 @@ def cart_detail(request):
 # 3. Checkout Logic
 @login_required
 def checkout(request):
-    """Summarizes items and processes the final order record."""
-    if not request.user.is_customer:
-        return redirect('vendor_dashboard')
-
     cart = request.session.get('cart', {})
     if not cart:
-        messages.error(request, "Your cart is empty.")
+        messages.warning(request, "Your cart is empty.")
         return redirect('marketplace')
 
+    # Calculate total and prepare data for the review page
     cart_items = []
     total_price = 0
     for pid, item in cart.items():
@@ -67,37 +64,31 @@ def checkout(request):
         cart_items.append({'product': product, 'quantity': item['quantity'], 'total': item_total})
 
     if request.method == 'POST':
-        with transaction.atomic():
-            order = Order.objects.create(
-                customer=request.user.customer_profile,
-                total_amount=total_price,
-                status='Pending'
+        # 1. Create the Order object
+        order = Order.objects.create(
+            customer=request.user.customer_profile,
+            total_amount=total_price,
+            status='Paid'  # Instant status update
+        )
+
+        # 2. Move items from Session Cart to OrderItem Model
+        for item in cart_items:
+            OrderItem.objects.create(
+                order=order,
+                product=item['product'],
+                quantity=item['quantity'],
+                price_at_purchase=item['product'].price
             )
 
-            for pid, item in cart.items():
-                product = get_object_or_404(Product, id=pid)
-                if product.stock < item['quantity']:
-                    messages.error(request, f"Sorry, {product.name} just went out of stock.")
-                    return redirect('cart_detail')
+        # 3. Clear the session cart
+        request.session['cart'] = {}
 
-                OrderItem.objects.create(
-                    order=order,
-                    product=product,
-                    quantity=item['quantity'],
-                    price_at_purchase=product.price
-                )
-
-                product.stock -= item['quantity']
-                product.save()
-
-            request.session['cart'] = {}
-            messages.success(request, "Order placed successfully!")
-            return redirect('customer_dashboard')
+        messages.success(request, f"Success! Order #{order.id} has been placed and paid.")
+        return redirect('customer_orders')
 
     return render(request, 'orders/checkout.html', {
         'cart_items': cart_items,
-        'total_price': total_price,
-        'customer': request.user.customer_profile
+        'total_price': total_price
     })
 
 
